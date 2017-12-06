@@ -1,0 +1,5 @@
+.idea
+.gradle
+CathegoriesRestServices.iml
+target
+/src/main/resources/local/
