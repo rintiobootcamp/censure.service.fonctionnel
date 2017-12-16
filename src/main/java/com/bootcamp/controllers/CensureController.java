@@ -19,6 +19,10 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ *
+ * @author Bello
+ */
 @RestController("CensureController")
 @RequestMapping("/censures")
 @Api(value = "Censure API", description = "Censure API")
@@ -31,25 +35,37 @@ public class CensureController {
     @Autowired
     HttpServletRequest request;
 
+    /**
+     * Create a censor in the database
+     *
+     * @param censure
+     * @return the created censor
+     */
     @RequestMapping(method = RequestMethod.POST)
     @ApiVersions({"1.0"})
     @ApiOperation(value = "Create a new censure", notes = "Create a new censure")
-    public ResponseEntity<Censure> create(@RequestBody @Valid Censure comment) {
+    public ResponseEntity<Censure> create(@RequestBody @Valid Censure censure) {
 
         HttpStatus httpStatus = null;
 
         try {
-            comment = censureService.create(comment);
+            censure = censureService.create(censure);
             httpStatus = HttpStatus.OK;
         } catch (SQLException ex) {
             Logger.getLogger(CensureController.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return new ResponseEntity<Censure>(comment, httpStatus);
+        return new ResponseEntity<Censure>(censure, httpStatus);
     }
 
+    /**
+     * Get a censor knowing its id
+     *
+     * @param id
+     * @return censure
+     */
     @RequestMapping(method = RequestMethod.GET, value = "/{id}")
     @ApiVersions({"1.0"})
-    @ApiOperation(value = "Read a comments", notes = "Read a comments")
+    @ApiOperation(value = "Read a censures", notes = "Read a censures")
     public ResponseEntity<Censure> read(@PathVariable(name = "id") int id) {
 
         Censure censure = new Censure();
@@ -66,9 +82,16 @@ public class CensureController {
         return new ResponseEntity<Censure>(censure, httpStatus);
     }
 
+    /**
+     * Get all the censors of a given entity
+     *
+     * @param entityId
+     * @param entityType
+     * @return censors list
+     */
     @RequestMapping(method = RequestMethod.GET, value = "/{entityType}/{entityId}")
     @ApiVersions({"1.0"})
-    @ApiOperation(value = "Read a comments", notes = "Read a comments")
+    @ApiOperation(value = "Read a censures", notes = "Read a censures")
     public ResponseEntity<List<Censure>> readByEntity(@PathVariable("entityId") int entityId, @PathVariable("entityType") String entityType) {
         EntityType entite = EntityType.valueOf(entityType);
         List<Censure> censure = new ArrayList<Censure>();

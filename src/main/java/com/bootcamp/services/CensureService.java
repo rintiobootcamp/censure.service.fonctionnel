@@ -18,6 +18,13 @@ import java.util.List;
 @Component
 public class CensureService implements DatabaseConstants {
 
+    /**
+     * Insert the censor in the database
+     *
+     * @param censure
+     * @return the censor
+     * @throws SQLException
+     */
     public Censure create(Censure censure) throws SQLException {
         censure.setDateCreation(System.currentTimeMillis());
         censure.setDateMiseAJour(System.currentTimeMillis());
@@ -25,25 +32,54 @@ public class CensureService implements DatabaseConstants {
         return censure;
     }
 
+    /**
+     * Update the censor in the database
+     *
+     * @param censure
+     * @return the censor
+     * @throws SQLException
+     */
     public Censure update(Censure censure) throws SQLException {
         CensureCRUD.update(censure);
         censure.setDateMiseAJour(System.currentTimeMillis());
         return censure;
     }
 
+    /**
+     * Delete the censor in the database
+     *
+     * @param id
+     * @return the censor
+     * @throws SQLException
+     */
     public Censure delete(int id) throws SQLException {
         Censure censure = read(id);
         CensureCRUD.delete(censure);
         return censure;
     }
 
+    /**
+     * Get a censor by its id
+     *
+     * @param id
+     * @return censor
+     * @throws SQLException
+     */
     public Censure read(int id) throws SQLException {
         Criterias criterias = new Criterias();
         criterias.addCriteria(new Criteria("id", "=", id));
         List<Censure> censures = CensureCRUD.read(criterias);
         return censures.get(0);
     }
-    
+
+    /**
+     * Get all the censors of a given entity
+     *
+     * @param entityId
+     * @param entityType
+     * @return censors list
+     * @throws SQLException
+     */
     public List<Censure> getByEntity(int entityId, EntityType entityType) throws SQLException {
         Criterias criterias = new Criterias();
         criterias.addCriteria(new Criteria(new Rule("entityId", "=", entityId), "AND"));
