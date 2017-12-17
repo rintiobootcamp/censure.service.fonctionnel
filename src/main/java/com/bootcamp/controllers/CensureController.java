@@ -107,4 +107,37 @@ public class CensureController {
 
         return new ResponseEntity<List<Censure>>(censure, httpStatus);
     }
+    
+        /**
+     * Get all the censors of the database
+     *
+     * @return censures list
+     * @throws Exception
+     */
+    @RequestMapping(method = RequestMethod.GET)
+    @ApiVersions({"1.0"})
+    @ApiOperation(value = "Get list of censure by request", notes = "Get list of censures by request")
+    public ResponseEntity<List<Censure>> findAll() throws Exception {
+        HttpStatus httpStatus = null;
+        List<Censure> censures = censureService.readAll(request);
+        httpStatus = HttpStatus.OK;
+        return new ResponseEntity<List<Censure>>(censures, httpStatus);
+    }
+
+    /**
+     * Delete a comment by its id
+     *
+     * @param id
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    @ApiVersions({"1.0"})
+    @ApiOperation(value = "delete censure ", notes = "delete censure by id")
+    public ResponseEntity<Censure> delete(@PathVariable int id) throws Exception {
+        HttpStatus httpStatus = null;
+        Censure censure = censureService.delete(id);
+        httpStatus = HttpStatus.OK;
+        return new ResponseEntity<Censure>(censure, httpStatus);
+    }
 }

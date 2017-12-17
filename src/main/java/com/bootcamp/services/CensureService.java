@@ -2,15 +2,19 @@ package com.bootcamp.services;
 
 import com.bootcamp.commons.constants.DatabaseConstants;
 import com.bootcamp.commons.enums.EntityType;
+import com.bootcamp.commons.exceptions.DatabaseException;
 import com.bootcamp.commons.models.Criteria;
 import com.bootcamp.commons.models.Criterias;
 import com.bootcamp.commons.models.Rule;
+import com.bootcamp.commons.ws.utils.RequestParser;
 import com.bootcamp.crud.CensureCRUD;
 import com.bootcamp.entities.Censure;
+import java.lang.reflect.InvocationTargetException;
 import org.springframework.stereotype.Component;
 
 import java.sql.SQLException;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Created by darextossa on 11/27/17.
@@ -85,5 +89,32 @@ public class CensureService implements DatabaseConstants {
         criterias.addCriteria(new Criteria(new Rule("entityId", "=", entityId), "AND"));
         criterias.addCriteria(new Criteria(new Rule("entityType", "=", entityType), null));
         return CensureCRUD.read(criterias);
+    }
+    
+        /**
+     * Get all the censors of the database matching the given request
+     *
+     * @param request
+     * @return censures list
+     * @throws SQLException
+     * @throws IllegalAccessException
+     * @throws DatabaseException
+     * @throws InvocationTargetException
+     */
+    public List<Censure> readAll(HttpServletRequest request) throws SQLException, IllegalAccessException, DatabaseException, InvocationTargetException {
+        Criterias criterias = RequestParser.getCriterias(request);
+        List<String> fields = RequestParser.getFields(request);
+        List<Censure> censures = null;
+        if (criterias == null && fields == null) {
+            censures = CensureCRUD.read();
+        } else if (criterias != null && fields == null) {
+            censures = CensureCRUD.read(criterias);
+        } else if (criterias == null && fields != null) {
+            censures = CensureCRUD.read(fields);
+        } else {
+            censures = CensureCRUD.read(criterias, fields);
+        }
+
+        return censures;
     }
 }
