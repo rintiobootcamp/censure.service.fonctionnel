@@ -56,10 +56,9 @@ public class CensureService implements DatabaseConstants {
      * @return the censor
      * @throws SQLException
      */
-    public Censure delete(int id) throws SQLException {
+    public boolean delete(int id) throws SQLException {
         Censure censure = read(id);
-        CensureCRUD.delete(censure);
-        return censure;
+        return CensureCRUD.delete(censure);
     }
 
     /**
@@ -117,4 +116,19 @@ public class CensureService implements DatabaseConstants {
 
         return censures;
     }
+
+    /**
+     * Check if a program exist in the database
+     *
+     * @param id
+     * @return
+     * @throws Exception
+     */
+    public boolean exist(int id) throws Exception {
+        if (read(id) != null) {
+            return true;
+        }
+        return false;
+    }
+
 }

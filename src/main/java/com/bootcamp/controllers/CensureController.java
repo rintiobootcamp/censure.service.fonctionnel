@@ -134,10 +134,11 @@ public class CensureController {
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     @ApiVersions({"1.0"})
     @ApiOperation(value = "delete censure ", notes = "delete censure by id")
-    public ResponseEntity<Censure> delete(@PathVariable int id) throws Exception {
+    public ResponseEntity<Boolean> delete(@PathVariable int id) throws Exception {
         HttpStatus httpStatus = null;
-        Censure censure = censureService.delete(id);
+        boolean b;
+        b = censureService.delete(id);
         httpStatus = HttpStatus.OK;
-        return new ResponseEntity<Censure>(censure, httpStatus);
+        return new ResponseEntity<>(b, httpStatus);
     }
 }
