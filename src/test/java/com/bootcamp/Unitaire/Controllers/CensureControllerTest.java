@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import com.google.gson.reflect.TypeToken;
+import org.apache.log4j.LogManager;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,7 +38,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import static jdk.nashorn.internal.codegen.Compiler.LOG;
+
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -61,6 +62,8 @@ public class CensureControllerTest {
     private MockMvc mockMvc;
     @MockBean
     private CensureService censureService;
+
+    private static org.apache.log4j.Logger LOG= LogManager.getLogger(CensureControllerTest.class);
 
     /**
      * get censure by id
