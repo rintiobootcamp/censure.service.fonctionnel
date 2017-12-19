@@ -74,7 +74,7 @@ public class CensureControllerIntegrationTest {
      * @see Censure#id
      * <b>you have to chenge the name of the censure if this name already
      * exists in the database
-     * @see Censure#getNom() else, the censure will be created but not
+     * @see Censure#getMessage() else, the censure will be created but not
      * wiht the given ID. and this will accure an error in the getById and
      * update method</b>
      * Note that this method will be the first to execute If every done , it
