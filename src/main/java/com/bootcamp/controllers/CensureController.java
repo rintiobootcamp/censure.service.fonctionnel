@@ -91,7 +91,7 @@ public class CensureController {
      */
     @RequestMapping(method = RequestMethod.GET, value = "/{entityType}/{entityId}")
     @ApiVersions({"1.0"})
-    @ApiOperation(value = "Read a censures", notes = "Read a censures")
+    @ApiOperation(value = "Read a censures by EntityType by EntityId", notes = "Read a censures by EntityType by EntityId")
     public ResponseEntity<List<Censure>> readByEntity(@PathVariable("entityId") int entityId, @PathVariable("entityType") String entityType) {
         EntityType entite = EntityType.valueOf(entityType);
         List<Censure> censure = new ArrayList<Censure>();
