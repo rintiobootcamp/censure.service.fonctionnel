@@ -10,10 +10,16 @@ import com.bootcamp.commons.ws.utils.RequestParser;
 import com.bootcamp.crud.CensureCRUD;
 import com.bootcamp.entities.Censure;
 import java.lang.reflect.InvocationTargetException;
+
+import com.bootcamp.entities.Region;
+import com.rintio.elastic.client.ElasticClient;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -56,7 +62,7 @@ public class CensureService implements DatabaseConstants {
      * @return the censor
      * @throws SQLException
      */
-    public boolean delete(int id) throws SQLException {
+    public boolean delete(int id) throws Exception {
         Censure censure = read(id);
         return CensureCRUD.delete(censure);
     }
@@ -68,11 +74,12 @@ public class CensureService implements DatabaseConstants {
      * @return censor
      * @throws SQLException
      */
-    public Censure read(int id) throws SQLException {
+    public Censure read(int id) throws Exception {
         Criterias criterias = new Criterias();
         criterias.addCriteria(new Criteria("id", "=", id));
-        List<Censure> censures = CensureCRUD.read(criterias);
-        return censures.get(0);
+//        List<Censure> censures = CensureCRUD.read(criterias);
+        Censure censure = getAllCensure().stream().filter(t->t.getId()==id).findFirst().get();
+        return censure;
     }
 
     /**
@@ -83,11 +90,12 @@ public class CensureService implements DatabaseConstants {
      * @return censors list
      * @throws SQLException
      */
-    public List<Censure> getByEntity(int entityId, EntityType entityType) throws SQLException {
+    public List<Censure> getByEntity(int entityId, EntityType entityType) throws Exception {
         Criterias criterias = new Criterias();
         criterias.addCriteria(new Criteria(new Rule("entityId", "=", entityId), "AND"));
         criterias.addCriteria(new Criteria(new Rule("entityType", "=", entityType), null));
-        return CensureCRUD.read(criterias);
+//        return CensureCRUD.read(criterias);
+        return getAllCensure().stream().filter(t->t.getEntityId()==entityId).filter(r->r.getEntityType().equals(entityType)).collect(Collectors.toList());
     }
     
         /**
@@ -100,12 +108,12 @@ public class CensureService implements DatabaseConstants {
      * @throws DatabaseException
      * @throws InvocationTargetException
      */
-    public List<Censure> readAll(HttpServletRequest request) throws SQLException, IllegalAccessException, DatabaseException, InvocationTargetException {
+    public List<Censure> readAll(HttpServletRequest request) throws Exception, IllegalAccessException, DatabaseException, InvocationTargetException {
         Criterias criterias = RequestParser.getCriterias(request);
         List<String> fields = RequestParser.getFields(request);
         List<Censure> censures = null;
         if (criterias == null && fields == null) {
-            censures = CensureCRUD.read();
+            censures = getAllCensure();
         } else if (criterias != null && fields == null) {
             censures = CensureCRUD.read(criterias);
         } else if (criterias == null && fields != null) {
@@ -116,6 +124,23 @@ public class CensureService implements DatabaseConstants {
 
         return censures;
     }
+
+    public List<Censure> getAllCensure() throws Exception{
+        ElasticClient elasticClient = new ElasticClient();
+        List<Object> objects = elasticClient.getAllObject("censures");
+        ModelMapper modelMapper = new ModelMapper();
+        List<Censure> rest = new ArrayList<>();
+        for(Object obj:objects){
+            rest.add(modelMapper.map(obj,Censure.class));
+        }
+        return rest;
+    }
+
+//    public void createCensureIndex(Censure censure) throws Exception{
+//        ElasticClient elasticClient = new ElasticClient();
+//        elasticClient.creerIndexObject("censures","censure",censure,censure.getId());
+//
+//    }
 
     /**
      * Check if a program exist in the database

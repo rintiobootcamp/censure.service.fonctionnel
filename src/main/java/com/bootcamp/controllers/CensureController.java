@@ -66,7 +66,7 @@ public class CensureController {
     @RequestMapping(method = RequestMethod.GET, value = "/{id}")
     @ApiVersions({"1.0"})
     @ApiOperation(value = "Read a censures", notes = "Read a censures")
-    public ResponseEntity<Censure> read(@PathVariable(name = "id") int id) {
+    public ResponseEntity<Censure> read(@PathVariable(name = "id") int id) throws Exception {
 
         Censure censure = new Censure();
         HttpStatus httpStatus = null;
@@ -92,7 +92,7 @@ public class CensureController {
     @RequestMapping(method = RequestMethod.GET, value = "/{entityType}/{entityId}")
     @ApiVersions({"1.0"})
     @ApiOperation(value = "Read a censures by EntityType by EntityId", notes = "Read a censures by EntityType by EntityId")
-    public ResponseEntity<List<Censure>> readByEntity(@PathVariable("entityId") int entityId, @PathVariable("entityType") String entityType) {
+    public ResponseEntity<List<Censure>> readByEntity(@PathVariable("entityId") int entityId, @PathVariable("entityType") String entityType) throws Exception{
         EntityType entite = EntityType.valueOf(entityType);
         List<Censure> censure = new ArrayList<Censure>();
         HttpStatus httpStatus = null;
