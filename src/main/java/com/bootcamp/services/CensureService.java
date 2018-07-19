@@ -27,7 +27,10 @@ import javax.servlet.http.HttpServletRequest;
  */
 @Component
 public class CensureService implements DatabaseConstants {
-
+    ElasticClient elasticClient;
+    public CensureService(){
+        elasticClient = new ElasticClient();
+    }
     /**
      * Insert the censor in the database
      *
@@ -134,6 +137,16 @@ public class CensureService implements DatabaseConstants {
             rest.add(modelMapper.map(obj,Censure.class));
         }
         return rest;
+    }
+
+    public boolean createIndexCensure()throws Exception{
+//        ElasticClient elasticClient = new ElasticClient();
+        List<Censure> censures = CensureCRUD.read();
+        for (Censure censure : censures){
+            elasticClient.creerIndexObjectNative("censures","censure",censure,censure.getId());
+//            LOG.info("censure "+censure.getId()+" created");
+        }
+        return true;
     }
 
 //    public void createCensureIndex(Censure censure) throws Exception{
