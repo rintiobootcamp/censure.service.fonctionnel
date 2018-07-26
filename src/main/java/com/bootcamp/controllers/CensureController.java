@@ -54,7 +54,7 @@ public class CensureController {
     @RequestMapping(method = RequestMethod.POST)
     @ApiVersions({"1.0"})
     @ApiOperation(value = "Create a new censure", notes = "Create a new censure")
-    public ResponseEntity<Censure> create(@RequestBody @Valid Censure censure) {
+    public ResponseEntity<Censure> create(@RequestBody @Valid Censure censure) throws Exception{
 
         HttpStatus httpStatus = null;
 
@@ -151,4 +151,5 @@ public class CensureController {
         httpStatus = HttpStatus.OK;
         return new ResponseEntity<>(b, httpStatus);
     }
+
 }

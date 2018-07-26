@@ -3,15 +3,12 @@ package com.bootcamp.services;
 import com.bootcamp.commons.constants.DatabaseConstants;
 import com.bootcamp.commons.enums.EntityType;
 import com.bootcamp.commons.exceptions.DatabaseException;
-import com.bootcamp.commons.models.Criteria;
 import com.bootcamp.commons.models.Criterias;
-import com.bootcamp.commons.models.Rule;
 import com.bootcamp.commons.ws.utils.RequestParser;
 import com.bootcamp.crud.CensureCRUD;
 import com.bootcamp.entities.Censure;
 import java.lang.reflect.InvocationTargetException;
 
-import com.bootcamp.entities.Region;
 import com.rintio.elastic.client.ElasticClient;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
@@ -23,7 +20,7 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * Created by darextossa on 11/27/17.
+ * Created by rintio on 11/27/17.
  */
 @Component
 public class CensureService implements DatabaseConstants {
@@ -38,10 +35,11 @@ public class CensureService implements DatabaseConstants {
      * @return the censor
      * @throws SQLException
      */
-    public Censure create(Censure censure) throws SQLException {
+    public Censure create(Censure censure) throws Exception {
         censure.setDateCreation(System.currentTimeMillis());
         censure.setDateMiseAJour(System.currentTimeMillis());
         CensureCRUD.create(censure);
+        createAllIndexCensure();
         return censure;
     }
 
@@ -52,9 +50,10 @@ public class CensureService implements DatabaseConstants {
      * @return the censor
      * @throws SQLException
      */
-    public Censure update(Censure censure) throws SQLException {
+    public Censure update(Censure censure) throws Exception {
         CensureCRUD.update(censure);
         censure.setDateMiseAJour(System.currentTimeMillis());
+        createAllIndexCensure();
         return censure;
     }
 
@@ -67,7 +66,9 @@ public class CensureService implements DatabaseConstants {
      */
     public boolean delete(int id) throws Exception {
         Censure censure = read(id);
-        return CensureCRUD.delete(censure);
+        if( CensureCRUD.delete(censure))
+            createAllIndexCensure();
+        return  true;
     }
 
     /**
@@ -78,8 +79,8 @@ public class CensureService implements DatabaseConstants {
      * @throws SQLException
      */
     public Censure read(int id) throws Exception {
-        Criterias criterias = new Criterias();
-        criterias.addCriteria(new Criteria("id", "=", id));
+//        Criterias criterias = new Criterias();
+//        criterias.addCriteria(new Criteria("id", "=", id));
 //        List<Censure> censures = CensureCRUD.read(criterias);
         Censure censure = getAllCensure().stream().filter(t->t.getId()==id).findFirst().get();
         return censure;
@@ -94,11 +95,11 @@ public class CensureService implements DatabaseConstants {
      * @throws SQLException
      */
     public List<Censure> getByEntity(int entityId, EntityType entityType) throws Exception {
-        Criterias criterias = new Criterias();
-        criterias.addCriteria(new Criteria(new Rule("entityId", "=", entityId), "AND"));
-        criterias.addCriteria(new Criteria(new Rule("entityType", "=", entityType), null));
+//        Criterias criterias = new Criterias();
+//        criterias.addCriteria(new Criteria(new Rule("entityId", "=", entityId), "AND"));
+//        criterias.addCriteria(new Criteria(new Rule("entityType", "=", entityType), null));
 //        return CensureCRUD.read(criterias);
-        return getAllCensure().stream().filter(t->t.getEntityId()==entityId).filter(r->r.getEntityType().equals(entityType)).collect(Collectors.toList());
+        return getAllCensure().stream().filter(t->t.getEntityId()==entityId && t.getEntityType().equals(entityType)).collect(Collectors.toList());
     }
     
         /**
@@ -167,6 +168,14 @@ public class CensureService implements DatabaseConstants {
             return true;
         }
         return false;
+    }
+
+    public boolean createAllIndexCensure()throws Exception{
+        List<Censure> censures = CensureCRUD.read();
+        for (Censure censure : censures){
+            elasticClient.creerIndexObjectNative("censures","censure",censure,censure.getId());
+        }
+        return true;
     }
 
 }
