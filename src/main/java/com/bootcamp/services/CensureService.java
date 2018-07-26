@@ -99,7 +99,7 @@ public class CensureService implements DatabaseConstants {
 //        criterias.addCriteria(new Criteria(new Rule("entityId", "=", entityId), "AND"));
 //        criterias.addCriteria(new Criteria(new Rule("entityType", "=", entityType), null));
 //        return CensureCRUD.read(criterias);
-        List<Censure> rest=  getAllCensure().stream().filter(t->t.getEntityType().equals(entityType)).collect(Collectors.toList());
+        List<Censure> rest=  getAllCensure().stream().filter(t->t.getEntityType().equalsIgnoreCase(entityType.toString())).collect(Collectors.toList());
         return rest.stream().filter(t->t.getEntityId()==entityId).collect(Collectors.toList());
     }
     
