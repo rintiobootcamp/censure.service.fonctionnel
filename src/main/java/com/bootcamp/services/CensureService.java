@@ -17,6 +17,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -25,9 +26,19 @@ import javax.servlet.http.HttpServletRequest;
 @Component
 public class CensureService implements DatabaseConstants {
     ElasticClient elasticClient;
-    public CensureService(){
+    private List<Censure> censures;
+    @PostConstruct
+    public void CensureService(){
+        this.censures = new ArrayList<>();
         elasticClient = new ElasticClient();
     }
+    public List<Censure> lireCensure() throws Exception
+    {
+        if(this.censures.isEmpty())
+            getAllCensure();
+        return  this.censures;
+    }
+
     /**
      * Insert the censor in the database
      *
@@ -82,7 +93,7 @@ public class CensureService implements DatabaseConstants {
 //        Criterias criterias = new Criterias();
 //        criterias.addCriteria(new Criteria("id", "=", id));
 //        List<Censure> censures = CensureCRUD.read(criterias);
-        Censure censure = getAllCensure().stream().filter(t->t.getId()==id).findFirst().get();
+        Censure censure = lireCensure().stream().filter(t->t.getId()==id).findFirst().get();
         return censure;
     }
 
@@ -99,7 +110,7 @@ public class CensureService implements DatabaseConstants {
 //        criterias.addCriteria(new Criteria(new Rule("entityId", "=", entityId), "AND"));
 //        criterias.addCriteria(new Criteria(new Rule("entityType", "=", entityType), null));
 //        return CensureCRUD.read(criterias);
-        List<Censure> rest=  getAllCensure().stream().filter(t->t.getEntityType().equalsIgnoreCase(entityType.toString())).collect(Collectors.toList());
+        List<Censure> rest=  lireCensure().stream().filter(t->t.getEntityType().equalsIgnoreCase(entityType.toString())).collect(Collectors.toList());
         return rest.stream().filter(t->t.getEntityId()==entityId).collect(Collectors.toList());
     }
     
@@ -118,7 +129,7 @@ public class CensureService implements DatabaseConstants {
         List<String> fields = RequestParser.getFields(request);
         List<Censure> censures = null;
         if (criterias == null && fields == null) {
-            censures = getAllCensure();
+            censures = lireCensure();
         } else if (criterias != null && fields == null) {
             censures = CensureCRUD.read(criterias);
         } else if (criterias == null && fields != null) {
@@ -138,6 +149,7 @@ public class CensureService implements DatabaseConstants {
         for(Object obj:objects){
             rest.add(modelMapper.map(obj,Censure.class));
         }
+        this.censures = rest;
         return rest;
     }
 
